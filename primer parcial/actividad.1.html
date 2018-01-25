@@ -40,19 +40,19 @@ function conectar() {
 
     }) 
 
-    
-
 
     pubnub.subscribe({
         channels: ['canal_k'],
         withPresence: true 
     });
 
-
-
-
-
 };
+
+function desconectar(){
+    pubnub.unsubscribe({
+        channels: ['canal_k']
+    });
+}
 
 function quien(){
     pubnub.hereNow(
@@ -81,15 +81,26 @@ function publicarMensaje() {
             console.log(status, response);
         })
     }
-function agarrarTexto(){
-
+function historial(){
+        pubnub.history(
+        {
+            channel : 'canal_k',
+            count : 9
+        },
+        function (status, response) 
+        {
+            console.log(response.messages);
+        }
+    );
 }
 </script>
 </head>
 <body>
 
   <button onclick="conectar()">Conectarse</button> 
+  <button onclick="desconectar()">Desconectarse</button> 
   <button onclick="publicarMensaje()">Publicame</button> 
+  <button onclick="historial()">historial</button> 
   <button onclick="quien()">Quien</button> 
   <input type="text" id="TEXTBOX_ID">
 

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>PubNub</title>
+
+<script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.20.0.js"></script>
+<script>
+
+function conectar() {
+   
+
+    //Crear instancia de PubNub
+    pubnub = new PubNub({
+        publishKey : 'pub-c-eabcc4e9-7a68-4887-85ef-08e17d74a177',
+        subscribeKey : 'sub-c-10eb0632-ff83-11e7-9ea4-0a4e479b9e51',
+        uuid: "123tamarindo"
+    })
+       
+    
+       
+    pubnub.addListener({
+        status: function(statusEvent) {
+            if (statusEvent.category === "PNConnectedCategory") {
+                console.log("conectado");
+            
+            }
+        },
+        message: function(message) {
+          console.log("Mensaje", message);
+          var node = document.createElement("p");
+          var textnode = document.createTextNode(message.message.username +": " + message.message.message);
+          node.appendChild(textnode);
+          document.getElementById("demo").appendChild(node);
+        },
+        presence: function(p) {
+            console.log(p.action)
+            console.log(p.uuid)
+            console.log(p.occupancy)    
+        }
+      
+    }) 
+
+    pubnub.subscribe({
+        channels: ['canal_k'],
+        withPresence: true 
+    });
+
+
+};
+
+function desconectar(){
+    pubnub.unsubscribe({
+        channels: ['canal_k']
+    });
+}
+function quien(){
+    pubnub.hereNow(
+    {
+        channels: ['canal_k'],
+        includeUUIDs: true,
+        includeState: true
+    },
+    function(status, response){
+        console.log(response);
+    }
+    );
+
+}
+
+function publicarMensaje() {
+    var textBox = document.getElementById('TEXTBOX_ID').value;
+    var json = {username: 'otro yo', 
+                message : textBox}
+        var publishConfig = {
+            channel : "canal_k",
+            message : json
+        }
+        pubnub.publish(publishConfig, function(status, response) {
+            console.log("Desde publicarMensaje");
+            console.log(status, response);
+        })
+    }
+function agarrarTexto(){
+
+}
+</script>
+</head>
+<body>
+
+  <button onclick="conectar()">Conectarse</button> 
+  <button onclick="publicarMensaje()">Publicame</button> 
+  <input type="text" id="TEXTBOX_ID">
+  <button onclick="quien()">Quien</button> 
+
+  <h1>Buenos dias</h1>
+  <p id="demo"></p>
+
+</body>
+</html>
